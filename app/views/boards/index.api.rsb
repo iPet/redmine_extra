@@ -1,0 +1,11 @@
+api.array :boards do
+  @boards.each do |board|
+    api.board do
+      api.id board.id
+      api.project(:id => board.project_id, :name => board.project.name) unless board.project.nil?
+      api.name board.name
+      api.description   board.description
+    end
+  end
+end
+

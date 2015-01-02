@@ -1,0 +1,25 @@
+api.array :replies do
+  @replies.each do |reply|
+    api.reply do
+      api.id reply.id
+      api.project(:id => reply.project.id, :name => reply.project.name) unless reply.project.nil?
+      api.content reply.content
+      api.subject reply.subject
+      api.topic(:id => @topic.id, :name => @topic.subject)
+      api.author(:id => reply.author_id, :name => reply.author.name) unless reply.author.nil?
+      api.forum(:id => reply.board.id, :name => reply.board.name) unless reply.board.nil?
+      api.updated_on reply.updated_on
+    end
+  end 
+  api.reply do
+     api.id @topic.id
+     api.project(:id => @topic.project.id, :name => @topic.project.name) unless @topic.project.nil?
+     api.content @topic.content
+     api.subject @topic.subject
+     api.topic(:id => @topic.id, :name => @topic.subject)
+     api.author(:id => @topic.author_id, :name => @topic.author.name) unless @topic.author.nil?
+     api.forum(:id => @topic.board.id, :name => @topic.board.name) unless @topic.board.nil?
+     api.updated_on @topic.updated_on
+  end
+end
+
