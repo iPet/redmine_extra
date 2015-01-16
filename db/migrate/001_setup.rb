@@ -286,7 +286,7 @@ class Setup < ActiveRecord::Migration
 
     # create default administrator account
     user = User.create :login => "admin",
-                       :hashed_password => "10533739ba43ea7b978158c7aa6aca0fce752d03",
+                       :hashed_password => "391fb9ac09ba790edd445bece2073a2366a00144",
                        :admin => true,
                        :firstname => "Redmine",
                        :lastname => "Admin",

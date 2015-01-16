@@ -10,7 +10,7 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-#
+#alt
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -24,7 +24,7 @@ class NewsController < ApplicationController
   before_filter :authorize, :except => [:index, :create]
   before_filter :find_optional_project, :only => [:index, :create]
   accept_rss_auth :index
-  accept_api_auth :index, :create, :update
+  accept_api_auth :index, :create
 
   helper :watchers
   helper :attachments
@@ -66,7 +66,6 @@ class NewsController < ApplicationController
     @news = News.new(:project => @project, :author => User.current)
   end
 
-
  def create
     @news = News.new(:project => @project, :author => User.current)
     @news.safe_attributes = params[:news]
@@ -94,19 +93,11 @@ class NewsController < ApplicationController
     @news.safe_attributes = params[:news]
     @news.save_attachments(params[:attachments])
     if @news.save
-      respond_to do |format|
-        format.html {
-      	  render_attachment_warning_if_needed(@news)
-          flash[:notice] = l(:notice_successful_update)
-          redirect_to news_path(@news)
-        }
-       format.api { render :action => 'show'}
-      end
+      render_attachment_warning_if_needed(@news)
+      flash[:notice] = l(:notice_successful_update)
+      redirect_to news_path(@news)
     else
-      respond_to do |format|
-        format.html { render :action => 'edit' }
-        format.html { render :action => 'show'}
-      end
+      render :action => 'edit'
     end
   end
 

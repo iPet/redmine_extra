@@ -21,10 +21,10 @@ class NewsController < ApplicationController
   before_filter :find_model_object, :except => [:new, :create, :index]
   before_filter :find_project_from_association, :except => [:new, :create, :index]
   before_filter :find_project_by_project_id, :only => [:new, :create]
-  before_filter :authorize, :except => [:index, :create]
-  before_filter :find_optional_project, :only => [:index, :create]
+  before_filter :authorize, :except => [:index]
+  before_filter :find_optional_project, :only => :index
   accept_rss_auth :index
-  accept_api_auth :index, :create, :update
+  accept_api_auth :index
 
   helper :watchers
   helper :attachments
@@ -64,10 +64,7 @@ class NewsController < ApplicationController
 
   def new
     @news = News.new(:project => @project, :author => User.current)
-  end
-
-
- def create
+  enddef create
     @news = News.new(:project => @project, :author => User.current)
     @news.safe_attributes = params[:news]
     @news.save_attachments(params[:attachments])
@@ -77,12 +74,36 @@ class NewsController < ApplicationController
          render_attachment_warning_if_needed(@news)
          flash[:notice] = l(:notice_successful_create)
          redirect_to project_news_index_path(@project)}
-        format.api {render :action => 'show'}
+        format.api {
+        render :action => 'show'
+        }
       end
     else
       respond_to do |format|
         format.html {render :action => 'new' }
-        format.api  {render :action => 'show'}
+        format.api {}
+       end
+    end
+  end
+
+  def create
+    @news = News.new(:project => @project, :author => User.current)
+    @news.safe_attributes = params[:news]
+    @news.save_attachments(params[:attachments])
+    if @news.save
+      respond_to do|format|
+       format.html {
+         render_attachment_warning_if_needed(@news)
+         flash[:notice] = l(:notice_successful_create)
+         redirect_to project_news_index_path(@project)
+       }format.api {
+        render :action => 'show'
+        }
+      end
+    else
+      respond_to do |format|
+        format.html {render :action => 'new' }
+        format.api {render_validation_errors(@news)}
        end
     end
   end
@@ -94,19 +115,11 @@ class NewsController < ApplicationController
     @news.safe_attributes = params[:news]
     @news.save_attachments(params[:attachments])
     if @news.save
-      respond_to do |format|
-        format.html {
-      	  render_attachment_warning_if_needed(@news)
-          flash[:notice] = l(:notice_successful_update)
-          redirect_to news_path(@news)
-        }
-       format.api { render :action => 'show'}
-      end
+      render_attachment_warning_if_needed(@news)
+      flash[:notice] = l(:notice_successful_update)
+      redirect_to news_path(@news)
     else
-      respond_to do |format|
-        format.html { render :action => 'edit' }
-        format.html { render :action => 'show'}
-      end
+      render :action => 'edit'
     end
   end
 

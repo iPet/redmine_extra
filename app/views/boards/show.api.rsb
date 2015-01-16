@@ -1,0 +1,8 @@
+api.array :topics do
+  @topics.each do |topic|
+    api.topic do
+      api.id topic.id
+    end
+  end
+end
+

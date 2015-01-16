@@ -23,7 +23,6 @@ class MessagesController < ApplicationController
   before_filter :find_message, :except => [:new, :preview]
   before_filter :authorize, :except => [:preview, :edit, :destroy]
   accept_api_auth :show, :create, :reply
-
   helper :boards
   helper :watchers
   helper :attachments
@@ -52,10 +51,9 @@ class MessagesController < ApplicationController
     @reply = Message.new(:subject => "RE: #{@message.subject}")
    respond_to do |format|
     format.html {
-      render :action => "show", :layout => false if request.xhr? 
-    }
-    format.api {
-       render :action => "show" }
+ render :action => "show", :layout => false if request.xhr? 
+}
+  format.api {render :action => "show" }
     end
   end
 
@@ -82,23 +80,20 @@ class MessagesController < ApplicationController
     @reply.board = @board
     @reply.safe_attributes = params[:reply]
     @topic.children << @reply
-
-    @replies = @topic.children
     if !@reply.new_record?
-        call_hook(:controller_messages_reply_after_save, { :params => params, :message => @reply})
-        attachments = Attachment.attach_files(@reply, params[:attachments])
-        render_attachment_warning_if_needed(@reply)
+      call_hook(:controller_messages_reply_after_save, { :params => params, :message => @reply})
+      attachments = Attachment.attach_files(@reply, params[:attachments])
+      render_attachment_warning_if_needed(@reply)
     end
     respond_to do |format|
-      format.html {redirect_to board_message_path(@board, @topic, :r => @reply) }
-      format.api {render :action => "show"}
+      format.html {
+        redirect_to board_message_path(@board, @topic, :r => @reply) #}
+      format.api
     end
   end
 
-
- # Edit a message
+  # Edit a message
   def edit
-    (render_403; return false) unless @message.editable_by?(User.current)
     @message.safe_attributes = params[:message]
     if request.post? && @message.save
       attachments = Attachment.attach_files(@message, params[:attachments])

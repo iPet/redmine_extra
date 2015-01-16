@@ -17,31 +17,21 @@
 
 class BoardsController < ApplicationController
   default_search_scope :messages
-  before_filter :find_project_by_project_id, :only => [:index, :create, :show]
-  before_filter :find_board_if_available  
-  before_filter :authorize, :except => [:index, :create]
-  before_filter :find_optional_project, :only => [:index, :create, :show]
+  before_filter :find_project_by_project_id, :find_board_if_available, :authorize
   accept_rss_auth :index, :show
-  accept_api_auth :index, :create, :show
+
   helper :sort
   include SortHelper
   helper :watchers
 
-  def index=
-    respond_to do |format|
-      format.html {
-        @boards = @project.boards.includes(:project, :last_message => :author).all
-        # show the board if there is only one
-        if @boards.size == 1
-          @board = @boards.first
-          show
-       end
-     }
-     format.api {
-       @boards = @project.boards.includes(:project, :last_message => :author).all
-    }
+  def index
+    @boards = @project.boards.includes(:project, :last_message => :author).all
+    # show the board if there is only one
+    if @boards.size == 1
+      @board = @boards.first
+      show
+    end
   end
- end
 
   def show
     respond_to do |format|
@@ -61,7 +51,7 @@ class BoardsController < ApplicationController
           order(sort_clause).
           preload(:author, {:last_reply => :author}).
           all
-        @message = Message.new(:board => @board)
+        @messsage = Message.new(:board => @board)
         render :action => 'show', :layout => !request.xhr?
       }
       format.atom {
@@ -73,9 +63,7 @@ class BoardsController < ApplicationController
         render_feed(@messages, :title => "#{@project}: #{@board}")
       }
      format.api {
-      @topics = @board.topics.all
-      render :action => 'show'
-     }
+       @board
     end
   end
 
@@ -91,10 +79,7 @@ class BoardsController < ApplicationController
       flash[:notice] = l(:notice_successful_create)
       redirect_to_settings_in_projects
     else
-       respond_to do |format|
-          format.html {render :action => 'new' }
-          format.api {render :action => 'show'}
-       end
+      render :action => 'new'
     end
   end
 

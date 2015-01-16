@@ -17,28 +17,30 @@
 
 class BoardsController < ApplicationController
   default_search_scope :messages
-  before_filter :find_project_by_project_id, :only => [:index, :create, :show]
+  before_filter :find_project_by_project_id, :only => [:index, :create]
   before_filter :find_board_if_available  
   before_filter :authorize, :except => [:index, :create]
-  before_filter :find_optional_project, :only => [:index, :create, :show]
+  before_filter :find_optional_project, :only => [:index, :create]
   accept_rss_auth :index, :show
-  accept_api_auth :index, :create, :show
+  accept_api_auth :index, :create
+
   helper :sort
   include SortHelper
   helper :watchers
 
-  def index=
+  def index
     respond_to do |format|
       format.html {
         @boards = @project.boards.includes(:project, :last_message => :author).all
         # show the board if there is only one
         if @boards.size == 1
-          @board = @boards.first
+          @board @boards = @project.boards.includes(:project, :last_message => :author).all
+= @boards.first
           show
        end
      }
      format.api {
-       @boards = @project.boards.includes(:project, :last_message => :author).all
+       @boards = @project.boards.all
     }
   end
  end
@@ -72,10 +74,7 @@ class BoardsController < ApplicationController
           all
         render_feed(@messages, :title => "#{@project}: #{@board}")
       }
-     format.api {
-      @topics = @board.topics.all
-      render :action => 'show'
-     }
+	format.api 
     end
   end
 

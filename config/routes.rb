@@ -33,6 +33,7 @@ RedmineApp::Application.routes.draw do
   match 'projects/:id/wiki', :to => 'wikis#edit', :via => :post
   match 'projects/:id/wiki/destroy', :to => 'wikis#destroy', :via => [:get, :post]
 
+  get 'boards/:boards_id/topics/index', :to => 'messages#index', :as => 'board_message'
   match 'boards/:board_id/topics/new', :to => 'messages#new', :via => [:get, :post], :as => 'new_board_message'
   get 'boards/:board_id/topics/:id', :to => 'messages#show', :as => 'board_message'
   match 'boards/:board_id/topics/quote/:id', :to => 'messages#quote', :via => [:get, :post]
@@ -82,7 +83,11 @@ RedmineApp::Application.routes.draw do
   delete 'watchers/watch', :to => 'watchers#unwatch'
   get 'watchers/new', :to => 'watchers#new'
   post 'watchers', :to => 'watchers#create'
+<<<<<<< HEAD
   post 'watchers/append', :to => 'watchers#append'
+=======
+   post 'watchers/append', :to => 'watchers#append'
+>>>>>>> a449a587f6182389e41a49ff6ca4b730651ec077
   delete 'watchers', :to => 'watchers#destroy'
   get 'watchers/autocomplete_for_user', :to => 'watchers#autocomplete_for_user'
   # Specific routes for issue watchers API
@@ -132,8 +137,9 @@ RedmineApp::Application.routes.draw do
     get 'roadmap', :to => 'versions#index', :format => false
     get 'versions', :to => 'versions#index'
 
+
     resources :news, :except => [:show, :edit, :update, :destroy]
-    resources :time_entries, :controller => 'timelog' do
+       resources :time_entries, :controller => 'timelog' do
       get 'report', :on => :collection
     end
     resources :queries, :only => [:new, :create]
@@ -191,8 +197,10 @@ RedmineApp::Application.routes.draw do
 
   resources :queries, :except => [:show]
 
-  resources :news, :only => [:index, :show, :edit, :update, :destroy]
+  resources :news, :only => [:index, :show, :edit, :update, :destroy, :create]
   match '/news/:id/comments', :to => 'comments#create', :via => :post
+ #  match '/news/', :to => 'news#create', :via => :post
+  post '/news/:id', :to => 'news#update'
   match '/news/:id/comments/:comment_id', :to => 'comments#destroy', :via => :delete
 
   resources :versions, :only => [:show, :edit, :update, :destroy] do

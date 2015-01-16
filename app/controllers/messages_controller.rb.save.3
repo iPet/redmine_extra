@@ -23,7 +23,6 @@ class MessagesController < ApplicationController
   before_filter :find_message, :except => [:new, :preview]
   before_filter :authorize, :except => [:preview, :edit, :destroy]
   accept_api_auth :show, :create, :reply
-
   helper :boards
   helper :watchers
   helper :attachments
@@ -52,10 +51,10 @@ class MessagesController < ApplicationController
     @reply = Message.new(:subject => "RE: #{@message.subject}")
    respond_to do |format|
     format.html {
-      render :action => "show", :layout => false if request.xhr? 
-    }
-    format.api {
-       render :action => "show" }
+ render :action => "show", :layout => false if request.xhr? 
+}
+  format.api {
+	render :action => "show" }
     end
   end
 
@@ -75,6 +74,7 @@ class MessagesController < ApplicationController
     end
   end
 
+
   # Reply to a topic
   def reply
     @reply = Message.new
@@ -82,8 +82,6 @@ class MessagesController < ApplicationController
     @reply.board = @board
     @reply.safe_attributes = params[:reply]
     @topic.children << @reply
-
-    @replies = @topic.children
     if !@reply.new_record?
         call_hook(:controller_messages_reply_after_save, { :params => params, :message => @reply})
         attachments = Attachment.attach_files(@reply, params[:attachments])
@@ -91,7 +89,8 @@ class MessagesController < ApplicationController
     end
     respond_to do |format|
       format.html {redirect_to board_message_path(@board, @topic, :r => @reply) }
-      format.api {render :action => "show"}
+      format.api 
+{render :action => "show"}
     end
   end
 
